@@ -1,8 +1,8 @@
 # Projeto_BD
 
-##Relatório Até o Momento do Processo de Desenvolvimento do trabalho de banco de dados para GFC Veículos:
+# Relatório Até o Momento do Processo de Desenvolvimento do trabalho de banco de dados para GFC Veículos:
 
-#Modelo Conceitual:
+## Modelo Conceitual:
 
 1. Identificação das Entidades Principais
 Etapa: Identificamos os principais objetos do sistema que possuem existência própria e são relevantes para o negócio.
