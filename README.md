@@ -84,3 +84,8 @@ Veículo - Manutenção: Recebe manutenções (1:N)
 Cliente - Endereço: Tem endereços (1:N)
 Veículo - Acessório: Possui acessórios (N:N)
 Vendedor - Vendedor: Gerencia vendedores (1:N)
+
+
+## Modelo Conceitual:
+
+![Trabalho_bd](https://github.com/Craudi01/Projeto_BD/assets/152215002/9ae01cbf-d01d-4ad9-858c-af358b98779f)
