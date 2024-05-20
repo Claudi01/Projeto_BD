@@ -86,6 +86,145 @@ Veículo - Acessório: Possui acessórios (N:N)
 Vendedor - Vendedor: Gerencia vendedores (1:N)
 
 
-## Modelo Conceitual:
+## Imagem Modelo Conceitual:
 
 ![Trabalho_bd](https://github.com/Craudi01/Projeto_BD/assets/152215002/9ae01cbf-d01d-4ad9-858c-af358b98779f)
+
+
+## Modelo Lógico:
+
+1. Transformação das Entidades em Tabelas
+Etapa: Convertendo entidades do modelo conceitual para tabelas no modelo lógico, incluindo os atributos e identificando as chaves primárias (PK) e estrangeiras (FK).
+
+Tabelas e Atributos:
+
+Pessoa:
+Atributos: ID_Pessoa (PK), Nome, CPF, Telefone, Email
+Cliente:
+Atributos: ID_Cliente (PK), ID_Pessoa (FK)
+Vendedor:
+Atributos: ID_Vendedor (PK), ID_Pessoa (FK), Gerente_ID (FK)
+Endereço:
+Atributos: ID_Endereço (PK), Rua, Número, Cidade, Estado, CEP, ID_Cliente (FK)
+Veículo:
+Atributos: ID_Veículo (PK), Modelo, Ano, Cor, Preço
+Venda:
+Atributos: ID_Venda (PK), Data_Venda, Valor_Total, Forma_Pagamento, ID_Cliente (FK), ID_Vendedor (FK)
+Financiamento:
+Atributos: ID_Financiamento (PK), ID_Venda (FK), Instituição_Financeira, Número_Parcelas, Valor_Parcela
+Manutenção:
+Atributos: ID_Manutenção (PK), Data_Manutenção, Tipo_Manutenção, Custo, ID_Veículo (FK), ID_Cliente (FK)
+Acessório:
+Atributos: ID_Acessório (PK), Nome, Descrição
+2. Definição dos Relacionamentos
+Etapa: Definimos os relacionamentos entre as tabelas usando chaves estrangeiras (FK) e asseguramos a integridade referencial.
+
+Relacionamentos e Cardinalidades:
+
+Cliente - Venda:
+Descrição: Realiza vendas.
+Cardinalidade: 1:N
+Chave Estrangeira: ID_Cliente em Venda.
+Vendedor - Venda:
+Descrição: Faz vendas.
+Cardinalidade: 1:N
+Chave Estrangeira: ID_Vendedor em Venda.
+Venda - Veículo:
+Descrição: Inclui veículos.
+Cardinalidade: N:N
+Tabela Associativa: Venda_Veículo com ID_Venda (FK), ID_Veículo (FK).
+Venda - Financiamento:
+Descrição: Tem financiamento.
+Cardinalidade: 1:1
+Chave Estrangeira: ID_Venda em Financiamento.
+Veículo - Manutenção:
+Descrição: Recebe manutenções.
+Cardinalidade: 1:N
+Chave Estrangeira: ID_Veículo em Manutenção.
+Cliente - Endereço:
+Descrição: Tem endereços.
+Cardinalidade: 1:N
+Chave Estrangeira: ID_Cliente em Endereço.
+Veículo - Acessório:
+Descrição: Possui acessórios.
+Cardinalidade: N:N
+Tabela Associativa: Veículo_Acessório com ID_Veículo (FK), ID_Acessório (FK).
+Vendedor - Vendedor:
+Descrição: Gerencia vendedores.
+Cardinalidade: 1:N
+Chave Estrangeira: Gerente_ID em Vendedor.
+3. Aplicação de Restrições e Regras de Integridade
+Etapa: Definimos restrições para garantir a integridade dos dados e regras específicas para atributos.
+
+Restrições:
+
+Pessoa:
+CPF: UNIQUE
+Email: UNIQUE
+Cliente:
+ID_Pessoa: FK
+Vendedor:
+ID_Pessoa: FK
+Gerente_ID: FK
+Endereço:
+ID_Cliente: FK
+Venda:
+ID_Cliente: FK
+ID_Vendedor: FK
+Financiamento:
+ID_Venda: FK
+Manutenção:
+ID_Veículo: FK
+ID_Cliente: FK
+Venda_Veículo:
+ID_Venda: FK
+ID_Veículo: FK
+Veículo_Acessório:
+ID_Veículo: FK
+ID_Acessório: FK
+4. Criação de Tabelas Associativas para Relacionamentos N:N
+Etapa: Implementamos tabelas associativas para representar relacionamentos muitos-para-muitos.
+
+Tabelas Associativas:
+
+Venda_Veículo:
+Atributos: ID_Venda (FK), ID_Veículo (FK)
+Veículo_Acessório:
+Atributos: ID_Veículo (FK), ID_Acessório (FK)
+Resumo dos Relacionamentos e Cardinalidades
+Cliente - Venda:
+
+Realiza vendas: 1:N
+Chave Estrangeira: ID_Cliente em Venda.
+Vendedor - Venda:
+
+Faz vendas: 1:N
+Chave Estrangeira: ID_Vendedor em Venda.
+Venda - Veículo:
+
+Inclui veículos: N:N
+Tabela Associativa: Venda_Veículo com ID_Venda (FK), ID_Veículo (FK).
+Venda - Financiamento:
+
+Tem financiamento: 1:1
+Chave Estrangeira: ID_Venda em Financiamento.
+Veículo - Manutenção:
+
+Recebe manutenções: 1:N
+Chave Estrangeira: ID_Veículo em Manutenção.
+Cliente - Endereço:
+
+Tem endereços: 1:N
+Chave Estrangeira: ID_Cliente em Endereço.
+Veículo - Acessório:
+
+Possui acessórios: N:N
+Tabela Associativa: Veículo_Acessório com ID_Veículo (FK), ID_Acessório (FK).
+Vendedor - Vendedor:
+
+Gerencia vendedores: 1:N
+Chave Estrangeira: Gerente_ID em Vendedor.
+
+## Imagem Modelo Lógico:
+
+![Trabalho_bd_Logico](https://github.com/Craudi01/Projeto_BD/assets/152215002/d97cc1cb-f111-4171-b457-5a43730ef310)
