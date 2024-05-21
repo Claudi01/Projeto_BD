@@ -6,9 +6,9 @@ def get_connection():
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            database='seu_banco_de_dados',
-            user='seu_usuario',
-            password='sua_senha'
+            database='projetoBD',
+            user='root',
+            password='Bradesco01'
         )
         if connection.is_connected():
             return connection
