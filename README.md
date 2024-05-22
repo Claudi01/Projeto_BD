@@ -2,6 +2,12 @@
 
 # Relatório Até o Momento do Processo de Desenvolvimento do trabalho de banco de dados para GFC Veículos:
 
+## Mini Mundo da GFC Veiculos: 
+
+![Captura de tela 2024-05-22 172448](https://github.com/Craudi01/Projeto_BD/assets/152215002/56f89e30-8933-47eb-8518-d6b5e74643d1)
+
+A GFC Veículos é uma empresa especializada na comercialização de veículos novos e usados. Além das vendas, a empresa oferece serviços de financiamento e manutenção para os seus clientes. A empresa possui uma equipe de vendedores responsáveis por conduzir as transações e manter o relacionamento com os clientes. A GFC Veículos mantém registros detalhados de clientes, vendedores, veículos, vendas, financiamentos, manutenções, acessórios e endereços
+
 ## Modelo Conceitual:
 
 1. Identificação das Entidades Principais
