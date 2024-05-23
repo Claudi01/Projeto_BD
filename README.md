@@ -2,7 +2,7 @@
 
 # Relatório Até o Momento do Processo de Desenvolvimento do trabalho de banco de dados para GFC Veículos:
 
-## Mini Mundo da GFC Veiculos: 
+## Mini Mundo da GFC Veículos: 
 
 ![Captura de tela 2024-05-22 172448](https://github.com/Craudi01/Projeto_BD/assets/152215002/56f89e30-8933-47eb-8518-d6b5e74643d1)
 
