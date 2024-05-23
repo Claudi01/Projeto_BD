@@ -29,7 +29,7 @@ def fetch_all():
     return []
 
 # Título do aplicativo
-st.title("Projeto de Banco de Dados")
+st.title("Banco de Dados GFC Veículos")
 
 # Leitura (Read)
 st.subheader("Registros Atuais")
