@@ -310,7 +310,7 @@ def manage_acessorios():
     if option == "Criar":
         st.subheader("Adicionar um Acessório")
         id_acessorio = st.text_input("ID do Acessório")
-        preco = st.text_input("Nome")
+        nome = st.text_input("Nome")
         descricao = st.text_input("Descrição")
         if st.button("Adicionar"):
             sql = "INSERT INTO Acessório (ID_Acessório, Nome, Descrição) VALUES (%s, %s, %s)"
