@@ -1,7 +1,6 @@
 import mysql.connector
 import streamlit as st
 
-# Conectar ao banco de dados
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -12,9 +11,7 @@ mycursor = mydb.cursor()
 
 print("Connection Established")
 
-# Criação do Trigger
 try:
-    mycursor.execute("DELIMITER //")
     mycursor.execute("""
         CREATE TRIGGER after_update_venda
         AFTER UPDATE ON Venda
@@ -24,15 +21,13 @@ try:
                 INSERT INTO Log_Alteracao_Venda (ID_Venda, Valor_Total_Antigo, Valor_Total_Novo, Data_Alteracao)
                 VALUES (OLD.ID_Venda, OLD.Valor_Total, NEW.Valor_Total, NOW());
             END IF;
-        END//
+        END;
     """)
-    mycursor.execute("DELIMITER ;")
     mydb.commit()
     print("Trigger created successfully!")
 except mysql.connector.Error as err:
     print("Error creating trigger:", err)
 
-# Função principal
 def main():
     relatorio_funcionario() 
     st.sidebar.title("Menu")
@@ -43,7 +38,6 @@ def main():
     elif page == "Administrador":
         administrador_page()
 
-# Página de Vendas
 def venda_page():
     st.title("Empresa de Vendas - Venda")
     st.subheader("Página de Venda")
@@ -55,7 +49,6 @@ def venda_page():
     elif tab == "Buscar Vendas":  
         buscar_vendas()  
 
-# Página do Administrador
 def administrador_page():
     st.title("Empresa de Vendas - Administrador")
     st.subheader("Página do Administrador")
@@ -73,7 +66,6 @@ def administrador_page():
     elif tab == "Relatório":
         relatorio_page()
 
-# Página de Relatório
 def relatorio_page():
     st.subheader("Relatório")
     st.write("Insira o ID do vendedor para gerar o relatório:")
@@ -86,7 +78,6 @@ def relatorio_page():
         else:
             st.write("Nenhum dado encontrado para gerar o relatório.")
 
-# Função de Relatório no MySQL
 def relatorio_funcionario_mysql(id_vendedor):
     try:
         mycursor.callproc("relatorio_funcionario")
@@ -97,10 +88,8 @@ def relatorio_funcionario_mysql(id_vendedor):
         print("Erro ao gerar o relatório:", err)
         return None
 
-# Função de Relatório
 def relatorio_funcionario():
     try:
-        mycursor.execute("DELIMITER //")
         mycursor.execute("""
             CREATE FUNCTION relatorio_funcionario()
             RETURNS TEXT
@@ -119,15 +108,13 @@ def relatorio_funcionario():
                 END IF;
 
                 RETURN relatorio;
-            END//
+            END;
         """)
-        mycursor.execute("DELIMITER ;")
         mydb.commit()
         print("Function created successfully!")
     except mysql.connector.Error as err:
         print("Error creating function:", err)
 
-# Gerenciar Vendedores
 def manage_vendedores():
     st.subheader("Gerenciar Vendedores")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
@@ -172,8 +159,7 @@ def manage_vendedores():
             mydb.commit()
             st.success("Vendedor Apagado com Sucesso!")
 
-# Gerenciar Clientes
-def manage_clientes():
+ def manage_clientes():
     st.subheader("Gerenciar Clientes")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
 
@@ -183,10 +169,11 @@ def manage_clientes():
         id_pessoa = st.text_input("ID da Pessoa")
         
         if st.button("Adicionar"):
-            # Verificar se ID_Pessoa existe na tabela Pessoa
+            # Check if ID_Pessoa exists in Pessoa table
             try:
                 mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (id_pessoa,))
                 pessoa_exists = mycursor.fetchone()[0]
+                st.write(f"ID_Pessoa {id_pessoa} exists in Pessoa table: {pessoa_exists > 0}")
                 
                 if pessoa_exists > 0:
                     try:
@@ -220,10 +207,11 @@ def manage_clientes():
         
         if st.button("Atualizar"):
             if campo == "ID_Pessoa":
-                # Verificar se novo ID_Pessoa existe na tabela Pessoa
+                # Check if new ID_Pessoa exists in Pessoa table
                 try:
                     mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (novo_valor,))
                     pessoa_exists = mycursor.fetchone()[0]
+                    st.write(f"Novo ID_Pessoa {novo_valor} exists in Pessoa table: {pessoa_exists > 0}")
                     
                     if not pessoa_exists:
                         st.error("Novo ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
@@ -254,7 +242,7 @@ def manage_clientes():
             except mysql.connector.Error as err:
                 st.error(f"Erro ao apagar cliente: {err}")
 
-# Gerenciar Veículos
+
 def manage_veiculos():
     st.subheader("Gerenciar Veículos")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
@@ -302,7 +290,6 @@ def manage_veiculos():
             mydb.commit()
             st.success("Veículo Apagado com Sucesso!")
 
-# Gerenciar Acessórios
 def manage_acessorios():
     st.subheader("Gerenciar Acessórios")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
@@ -348,7 +335,6 @@ def manage_acessorios():
             mydb.commit()
             st.success("Acessório Apagado com Sucesso!")
 
-# Buscar Vendas
 def buscar_vendas():
     st.subheader("Buscar Vendas")
     id_venda = st.text_input("ID da Venda")
@@ -363,7 +349,6 @@ def buscar_vendas():
         else:
             st.write("Nenhuma venda encontrada com o ID fornecido.")
 
-# Gerenciar Dados da Venda
 def manage_dados():
     st.subheader("Gerenciar Dados da Venda")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
@@ -411,5 +396,7 @@ def manage_dados():
             mydb.commit()
             st.success("Venda Apagada com Sucesso!")
 
+if __name__ == "__main__":
+    main()
 if __name__ == "__main__":
     main()
