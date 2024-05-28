@@ -45,7 +45,7 @@ def main():
 
 # Página de Vendas
 def venda_page():
-    st.title("Empresa de Vendas - Venda")
+    st.title("GFC Veículos - Venda")
     st.subheader("Página de Venda")
     tabs = ["Gerenciar Dados", "Buscar Vendas"]  
     tab = st.selectbox("Selecione uma Função", tabs)
@@ -57,7 +57,7 @@ def venda_page():
 
 # Página do Administrador
 def administrador_page():
-    st.title("Empresa de Vendas - Administrador")
+    st.title("GFC Veículos - Administrador")
     st.subheader("Página do Administrador")
     tabs = ["Gerenciar Pessoas", "Gerenciar Vendedores", "Gerenciar Clientes", "Gerenciar Veículos", "Gerenciar Acessórios", "Relatório"]
     tab = st.selectbox("Selecione uma Função", tabs)
