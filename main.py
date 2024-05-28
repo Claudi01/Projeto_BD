@@ -310,11 +310,11 @@ def manage_acessorios():
     if option == "Criar":
         st.subheader("Adicionar um Acessório")
         id_acessorio = st.text_input("ID do Acessório")
+        preco = st.text_input("Nome")
         descricao = st.text_input("Descrição")
-        preco = st.text_input("Preço")
         if st.button("Adicionar"):
-            sql = "INSERT INTO Acessório (ID_Acessório, Descrição, Preço) VALUES (%s, %s, %s)"
-            val = (id_acessorio, descricao, preco)
+            sql = "INSERT INTO Acessório (ID_Acessório, Nome, Descrição) VALUES (%s, %s, %s)"
+            val = (id_acessorio, nome, descricao)
             mycursor.execute(sql, val)
             mydb.commit()
             st.success("Acessório Adicionado com Sucesso!")
