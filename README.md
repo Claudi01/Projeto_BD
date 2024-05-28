@@ -231,6 +231,110 @@ Vendedor - Vendedor:
 Gerencia vendedores: 1:N
 Chave Estrangeira: Gerente_ID em Vendedor.
 
+
+
 ## Imagem Modelo Lógico:
 
 ![Trabalho_bd_Logico](https://github.com/Craudi01/Projeto_BD/assets/152215002/d97cc1cb-f111-4171-b457-5a43730ef310)
+
+
+
+## Codigo do Banco de dados: 
+
+CREATE DATABASE projetoBD;
+
+USE projetoBD;
+CREATE TABLE Pessoa (
+    ID_Pessoa INT PRIMARY KEY,
+    Nome VARCHAR(100),
+    CPF CHAR(11) UNIQUE,
+    Telefone VARCHAR(15),
+    Email VARCHAR(100)
+);
+
+CREATE TABLE Cliente (
+    ID_Cliente INT PRIMARY KEY,
+    ID_Pessoa INT,
+    FOREIGN KEY (ID_Pessoa) REFERENCES Pessoa(ID_Pessoa)
+);
+
+CREATE TABLE Vendedor (
+    ID_Vendedor INT PRIMARY KEY,
+    ID_Pessoa INT,
+    Gerente_ID INT,
+    FOREIGN KEY (ID_Pessoa) REFERENCES Pessoa(ID_Pessoa),
+    FOREIGN KEY (Gerente_ID) REFERENCES Vendedor(ID_Vendedor)
+);
+
+CREATE TABLE Endereço (
+    ID_Endereço INT PRIMARY KEY,
+    Rua VARCHAR(100),
+    Número INT,
+    Cidade VARCHAR(50),
+    Estado CHAR(2),
+    CEP CHAR(8),
+    ID_Cliente INT,
+    FOREIGN KEY (ID_Cliente) REFERENCES Cliente(ID_Cliente)
+);
+
+CREATE TABLE Veículo (
+    ID_Veículo INT PRIMARY KEY,
+    Modelo VARCHAR(50),
+    Ano YEAR,
+    Cor VARCHAR(20),
+    Preço DECIMAL(10, 2)
+);
+
+CREATE TABLE Venda (
+    ID_Venda INT PRIMARY KEY,
+    Data_Venda DATE,
+    Valor_Total DECIMAL(10, 2),
+    Forma_Pagamento VARCHAR(20),
+    ID_Cliente INT,
+    ID_Vendedor INT,
+    FOREIGN KEY (ID_Cliente) REFERENCES Cliente(ID_Cliente),
+    FOREIGN KEY (ID_Vendedor) REFERENCES Vendedor(ID_Vendedor)
+);
+
+CREATE TABLE Financiamento (
+    ID_Financiamento INT PRIMARY KEY,
+    ID_Venda INT,
+    Instituição_Financeira VARCHAR(100),
+    Número_Parcelas INT,
+    Valor_Parcela DECIMAL(10, 2),
+    FOREIGN KEY (ID_Venda) REFERENCES Venda(ID_Venda)
+);
+
+CREATE TABLE Manutenção (
+    ID_Manutenção INT PRIMARY KEY,
+    Data_Manutenção DATE,
+    Tipo_Manutenção VARCHAR(50),
+    Custo DECIMAL(10, 2),
+    ID_Veículo INT,
+    ID_Cliente INT,
+    FOREIGN KEY (ID_Veículo) REFERENCES Veículo(ID_Veículo),
+    FOREIGN KEY (ID_Cliente) REFERENCES Cliente(ID_Cliente)
+);
+
+CREATE TABLE Acessório (
+    ID_Acessório INT PRIMARY KEY,
+    Nome VARCHAR(50),
+    Descrição TEXT
+);
+
+CREATE TABLE Veículo_Acessório (
+    ID_Veículo INT,
+    ID_Acessório INT,
+    PRIMARY KEY (ID_Veículo, ID_Acessório),
+    FOREIGN KEY (ID_Veículo) REFERENCES Veículo(ID_Veículo),
+    FOREIGN KEY (ID_Acessório) REFERENCES Acessório(ID_Acessório)
+);
+
+CREATE TABLE Venda_Veículo (
+    ID_Venda INT,
+    ID_Veículo INT,
+    PRIMARY KEY (ID_Venda, ID_Veículo),
+    FOREIGN KEY (ID_Venda) REFERENCES Venda(ID_Venda),
+    FOREIGN KEY (ID_Veículo) REFERENCES Veículo(ID_Veículo)
+);
+
