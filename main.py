@@ -37,7 +37,8 @@ def add_pessoa(nome, cpf, telefone, email):
     if connection:
         try:
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO Pessoa (Nome, CPF, Telefone, Email) VALUES (%s, %s, %s, %s)", (nome, cpf, telefone, email))
+            cursor.execute("INSERT INTO Pessoa (Nome, CPF, Telefone, Email) VALUES (%s, %s, %s, %s)", 
+                           (nome, cpf, telefone, email))
             connection.commit()
             st.success("Pessoa adicionada com sucesso!")
         except Error as e:
@@ -182,6 +183,62 @@ def update_vendedor(id_vendedor, id_pessoa, gerente_id):
         finally:
             connection.close()
 
+# Funções de CRUD para Endereço
+def fetch_all_enderecos():
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM Endereço")
+            rows = cursor.fetchall()
+            return rows
+        except Error as e:
+            st.error(f"Erro ao buscar registros de Endereço: {e}")
+        finally:
+            connection.close()
+    return []
+
+def add_endereco(rua, numero, cidade, estado, cep, id_cliente):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO Endereço (Rua, Número, Cidade, Estado, CEP, ID_Cliente) VALUES (%s, %s, %s, %s, %s, %s)", 
+                           (rua, numero, cidade, estado, cep, id_cliente))
+            connection.commit()
+            st.success("Endereço adicionado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao adicionar endereço: {e}")
+        finally:
+            connection.close()
+
+def delete_endereco(id_endereco):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM Endereço WHERE ID_Endereço = %s", (id_endereco,))
+            connection.commit()
+            st.success("Endereço deletado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao deletar endereço: {e}")
+        finally:
+            connection.close()
+
+def update_endereco(id_endereco, rua, numero, cidade, estado, cep, id_cliente):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("UPDATE Endereço SET Rua = %s, Número = %s, Cidade = %s, Estado = %s, CEP = %s, ID_Cliente = %s WHERE ID_Endereço = %s", 
+                           (rua, numero, cidade, estado, cep, id_cliente, id_endereco))
+            connection.commit()
+            st.success("Endereço atualizado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao atualizar endereço: {e}")
+        finally:
+            connection.close()
+
 # Interface Streamlit
 st.title("Banco de Dados GFC Veículos")
 
@@ -268,6 +325,41 @@ with st.form("update_vendedor_form"):
     if submit_update_vendedor:
         update_vendedor(id_vendedor_upd, id_pessoa_vendedor_upd, gerente_id_upd)
 
+# Adicionar Endereço
+st.subheader("Adicionar Novo Endereço")
+with st.form("add_endereco_form"):
+    rua = st.text_input("Rua")
+    numero = st.number_input("Número", min_value=1, step=1)
+    cidade = st.text_input("Cidade")
+    estado = st.text_input("Estado")
+    cep = st.text_input("CEP")
+    id_cliente = st.number_input("ID do Cliente", min_value=1, step=1)
+    submit_add_endereco = st.form_submit_button("Adicionar Endereço")
+    if submit_add_endereco:
+        add_endereco(rua, numero, cidade, estado, cep, id_cliente)
+
+# Deletar Endereço
+st.subheader("Deletar Endereço")
+with st.form("delete_endereco_form"):
+    id_endereco_del = st.number_input("ID do Endereço", min_value=1, step=1)
+    submit_delete_endereco = st.form_submit_button("Deletar Endereço")
+    if submit_delete_endereco:
+        delete_endereco(id_endereco_del)
+
+# Atualizar Endereço
+st.subheader("Atualizar Endereço")
+with st.form("update_endereco_form"):
+    id_endereco_upd = st.number_input("ID do Endereço", min_value=1, step=1, key="id_endereco_upd")
+    rua_upd = st.text_input("Rua", key="rua_upd")
+    numero_upd = st.number_input("Número", min_value=1, step=1, key="numero_upd")
+    cidade_upd = st.text_input("Cidade", key="cidade_upd")
+    estado_upd = st.text_input("Estado", key="estado_upd")
+    cep_upd = st.text_input("CEP", key="cep_upd")
+    id_cliente_upd = st.number_input("ID do Cliente", min_value=1, step=1, key="id_cliente_upd")
+    submit_update_endereco = st.form_submit_button("Atualizar Endereço")
+    if submit_update_endereco:
+        update_endereco(id_endereco_upd, rua_upd, numero_upd, cidade_upd, estado_upd, cep_upd, id_cliente_upd)
+
 # Exibição de Dados
 st.subheader("Lista de Pessoas")
 pessoas = fetch_all_pessoas()
@@ -290,3 +382,9 @@ if vendedores:
 else:
     st.write("Nenhum vendedor encontrado.")
 
+st.subheader("Lista de Endereços")
+enderecos = fetch_all_enderecos()
+if enderecos:
+    st.table(enderecos)
+else:
+    st.write("Nenhum endereço encontrado.")
