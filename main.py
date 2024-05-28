@@ -17,7 +17,7 @@ def get_connection():
         st.error(f"Erro ao conectar ao banco de dados: {e}")
         return None
 
-# Função para buscar todos os registros da tabela Pessoa
+# Funções de CRUD para Pessoa
 def fetch_all_pessoas():
     connection = get_connection()
     if connection:
@@ -32,7 +32,6 @@ def fetch_all_pessoas():
             connection.close()
     return []
 
-# Função para adicionar nova pessoa
 def add_pessoa(nome, cpf, telefone, email):
     connection = get_connection()
     if connection:
@@ -46,7 +45,34 @@ def add_pessoa(nome, cpf, telefone, email):
         finally:
             connection.close()
 
-# Função para buscar todos os registros da tabela Cliente
+def delete_pessoa(id_pessoa):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM Pessoa WHERE ID_Pessoa = %s", (id_pessoa,))
+            connection.commit()
+            st.success("Pessoa deletada com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao deletar pessoa: {e}")
+        finally:
+            connection.close()
+
+def update_pessoa(id_pessoa, nome, cpf, telefone, email):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("UPDATE Pessoa SET Nome = %s, CPF = %s, Telefone = %s, Email = %s WHERE ID_Pessoa = %s", 
+                           (nome, cpf, telefone, email, id_pessoa))
+            connection.commit()
+            st.success("Pessoa atualizada com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao atualizar pessoa: {e}")
+        finally:
+            connection.close()
+
+# Funções de CRUD para Cliente
 def fetch_all_clientes():
     connection = get_connection()
     if connection:
@@ -61,7 +87,6 @@ def fetch_all_clientes():
             connection.close()
     return []
 
-# Função para adicionar novo cliente
 def add_cliente(id_pessoa):
     connection = get_connection()
     if connection:
@@ -75,7 +100,34 @@ def add_cliente(id_pessoa):
         finally:
             connection.close()
 
-# Função para buscar todos os registros da tabela Vendedor
+def delete_cliente(id_cliente):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM Cliente WHERE ID_Cliente = %s", (id_cliente,))
+            connection.commit()
+            st.success("Cliente deletado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao deletar cliente: {e}")
+        finally:
+            connection.close()
+
+def update_cliente(id_cliente, id_pessoa):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("UPDATE Cliente SET ID_Pessoa = %s WHERE ID_Cliente = %s", 
+                           (id_pessoa, id_cliente))
+            connection.commit()
+            st.success("Cliente atualizado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao atualizar cliente: {e}")
+        finally:
+            connection.close()
+
+# Funções de CRUD para Vendedor
 def fetch_all_vendedores():
     connection = get_connection()
     if connection:
@@ -90,7 +142,6 @@ def fetch_all_vendedores():
             connection.close()
     return []
 
-# Função para adicionar novo vendedor
 def add_vendedor(id_pessoa, gerente_id):
     connection = get_connection()
     if connection:
@@ -104,7 +155,34 @@ def add_vendedor(id_pessoa, gerente_id):
         finally:
             connection.close()
 
-# Título do aplicativo
+def delete_vendedor(id_vendedor):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM Vendedor WHERE ID_Vendedor = %s", (id_vendedor,))
+            connection.commit()
+            st.success("Vendedor deletado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao deletar vendedor: {e}")
+        finally:
+            connection.close()
+
+def update_vendedor(id_vendedor, id_pessoa, gerente_id):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("UPDATE Vendedor SET ID_Pessoa = %s, Gerente_ID = %s WHERE ID_Vendedor = %s", 
+                           (id_pessoa, gerente_id, id_vendedor))
+            connection.commit()
+            st.success("Vendedor atualizado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao atualizar vendedor: {e}")
+        finally:
+            connection.close()
+
+# Interface Streamlit
 st.title("Banco de Dados GFC Veículos")
 
 # Adicionar Pessoa
@@ -118,19 +196,97 @@ with st.form("add_pessoa_form"):
     if submit_add_pessoa:
         add_pessoa(nome, cpf, telefone, email)
 
+# Deletar Pessoa
+st.subheader("Deletar Pessoa")
+with st.form("delete_pessoa_form"):
+    id_pessoa_del = st.number_input("ID da Pessoa", min_value=1, step=1)
+    submit_delete_pessoa = st.form_submit_button("Deletar Pessoa")
+    if submit_delete_pessoa:
+        delete_pessoa(id_pessoa_del)
+
+# Atualizar Pessoa
+st.subheader("Atualizar Pessoa")
+with st.form("update_pessoa_form"):
+    id_pessoa_upd = st.number_input("ID da Pessoa", min_value=1, step=1, key="id_pessoa_upd")
+    nome_upd = st.text_input("Nome", key="nome_upd")
+    cpf_upd = st.text_input("CPF", key="cpf_upd")
+    telefone_upd = st.text_input("Telefone", key="telefone_upd")
+    email_upd = st.text_input("Email", key="email_upd")
+    submit_update_pessoa = st.form_submit_button("Atualizar Pessoa")
+    if submit_update_pessoa:
+        update_pessoa(id_pessoa_upd, nome_upd, cpf_upd, telefone_upd, email_upd)
+
 # Adicionar Cliente
 st.subheader("Adicionar Novo Cliente")
 with st.form("add_cliente_form"):
-    id_pessoa_cliente = st.number_input("ID da Pessoa do Cliente")
+    id_pessoa_cliente = st.number_input("ID da Pessoa do Cliente", min_value=1, step=1)
     submit_add_cliente = st.form_submit_button("Adicionar Cliente")
     if submit_add_cliente:
         add_cliente(id_pessoa_cliente)
 
+# Deletar Cliente
+st.subheader("Deletar Cliente")
+with st.form("delete_cliente_form"):
+    id_cliente_del = st.number_input("ID do Cliente", min_value=1, step=1)
+    submit_delete_cliente = st.form_submit_button("Deletar Cliente")
+    if submit_delete_cliente:
+        delete_cliente(id_cliente_del)
+
+# Atualizar Cliente
+st.subheader("Atualizar Cliente")
+with st.form("update_cliente_form"):
+    id_cliente_upd = st.number_input("ID do Cliente", min_value=1, step=1, key="id_cliente_upd")
+    id_pessoa_upd = st.number_input("ID da Pessoa", min_value=1, step=1, key="id_pessoa_cliente_upd")
+    submit_update_cliente = st.form_submit_button("Atualizar Cliente")
+    if submit_update_cliente:
+        update_cliente(id_cliente_upd, id_pessoa_upd)
+
 # Adicionar Vendedor
 st.subheader("Adicionar Novo Vendedor")
 with st.form("add_vendedor_form"):
-    id_pessoa_vendedor = st.number_input("ID da Pessoa do Vendedor")
-    gerente_id = st.number_input("ID do Gerente (se aplicável)")
+    id_pessoa_vendedor = st.number_input("ID da Pessoa do Vendedor", min_value=1, step=1)
+    gerente_id = st.number_input("ID do Gerente (se aplicável)", min_value=0, step=1)
     submit_add_vendedor = st.form_submit_button("Adicionar Vendedor")
     if submit_add_vendedor:
         add_vendedor(id_pessoa_vendedor, gerente_id)
+
+# Deletar Vendedor
+st.subheader("Deletar Vendedor")
+with st.form("delete_vendedor_form"):
+    id_vendedor_del = st.number_input("ID do Vendedor", min_value=1, step=1)
+    submit_delete_vendedor = st.form_submit_button("Deletar Vendedor")
+    if submit_delete_vendedor:
+        delete_vendedor(id_vendedor_del)
+
+# Atualizar Vendedor
+st.subheader("Atualizar Vendedor")
+with st.form("update_vendedor_form"):
+    id_vendedor_upd = st.number_input("ID do Vendedor", min_value=1, step=1, key="id_vendedor_upd")
+    id_pessoa_vendedor_upd = st.number_input("ID da Pessoa do Vendedor", min_value=1, step=1, key="id_pessoa_vendedor_upd")
+    gerente_id_upd = st.number_input("ID do Gerente (se aplicável)", min_value=0, step=1, key="gerente_id_upd")
+    submit_update_vendedor = st.form_submit_button("Atualizar Vendedor")
+    if submit_update_vendedor:
+        update_vendedor(id_vendedor_upd, id_pessoa_vendedor_upd, gerente_id_upd)
+
+# Exibição de Dados
+st.subheader("Lista de Pessoas")
+pessoas = fetch_all_pessoas()
+if pessoas:
+    st.table(pessoas)
+else:
+    st.write("Nenhuma pessoa encontrada.")
+
+st.subheader("Lista de Clientes")
+clientes = fetch_all_clientes()
+if clientes:
+    st.table(clientes)
+else:
+    st.write("Nenhum cliente encontrado.")
+
+st.subheader("Lista de Vendedores")
+vendedores = fetch_all_vendedores()
+if vendedores:
+    st.table(vendedores)
+else:
+    st.write("Nenhum vendedor encontrado.")
+
