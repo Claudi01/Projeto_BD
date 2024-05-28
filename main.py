@@ -167,12 +167,23 @@ def manage_clientes():
         st.subheader("Adicionar um Cliente")
         id_cliente = st.text_input("ID do Cliente")
         id_pessoa = st.text_input("ID da Pessoa")
+        
         if st.button("Adicionar"):
-            sql = "INSERT INTO Cliente (ID_Cliente, ID_Pessoa) VALUES (%s, %s)"
-            val = (id_cliente, id_pessoa)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Cliente Adicionado com Sucesso!")
+            # Check if ID_Pessoa exists in Pessoa table
+            mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (id_pessoa,))
+            pessoa_exists = mycursor.fetchone()[0]
+            
+            if pessoa_exists:
+                try:
+                    sql = "INSERT INTO Cliente (ID_Cliente, ID_Pessoa) VALUES (%s, %s)"
+                    val = (id_cliente, id_pessoa)
+                    mycursor.execute(sql, val)
+                    mydb.commit()
+                    st.success("Cliente Adicionado com Sucesso!")
+                except mysql.connector.Error as err:
+                    st.error(f"Erro ao adicionar cliente: {err}")
+            else:
+                st.error("ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
 
     elif option == "Ler":
         st.subheader("Ver Clientes")
@@ -186,22 +197,39 @@ def manage_clientes():
         id_cliente = st.text_input("ID do Cliente")
         campo = st.selectbox("Campo para Atualizar", ["ID_Pessoa"])
         novo_valor = st.text_input(f"Novo Valor para {campo}")
+        
         if st.button("Atualizar"):
-            sql = f"UPDATE Cliente SET {campo}=%s WHERE ID_Cliente=%s"
-            val = (novo_valor, id_cliente)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Cliente Atualizado com Sucesso!")
+            if campo == "ID_Pessoa":
+                # Check if new ID_Pessoa exists in Pessoa table
+                mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (novo_valor,))
+                pessoa_exists = mycursor.fetchone()[0]
+                
+                if not pessoa_exists:
+                    st.error("Novo ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
+                    return
+            
+            try:
+                sql = f"UPDATE Cliente SET {campo}=%s WHERE ID_Cliente=%s"
+                val = (novo_valor, id_cliente)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Cliente Atualizado com Sucesso!")
+            except mysql.connector.Error as err:
+                st.error(f"Erro ao atualizar cliente: {err}")
 
     elif option == "Apagar":
         st.subheader("Apagar Cliente")
         id_cliente = st.text_input("ID do Cliente")
         if st.button("Apagar"):
-            sql = "DELETE FROM Cliente WHERE ID_Cliente=%s"
-            val = (id_cliente,)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Cliente Apagado com Sucesso!")
+            try:
+                sql = "DELETE FROM Cliente WHERE ID_Cliente=%s"
+                val = (id_cliente,)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Cliente Apagado com Sucesso!")
+            except mysql.connector.Error as err:
+                st.error(f"Erro ao apagar cliente: {err}")
+
 
 def manage_veiculos():
     st.subheader("Gerenciar Veículos")
