@@ -159,7 +159,7 @@ def manage_vendedores():
             mydb.commit()
             st.success("Vendedor Apagado com Sucesso!")
 
-def manage_clientes():
+ def manage_clientes():
     st.subheader("Gerenciar Clientes")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
 
@@ -170,27 +170,34 @@ def manage_clientes():
         
         if st.button("Adicionar"):
             # Check if ID_Pessoa exists in Pessoa table
-            mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (id_pessoa,))
-            pessoa_exists = mycursor.fetchone()[0]
-            
-            if pessoa_exists:
-                try:
-                    sql = "INSERT INTO Cliente (ID_Cliente, ID_Pessoa) VALUES (%s, %s)"
-                    val = (id_cliente, id_pessoa)
-                    mycursor.execute(sql, val)
-                    mydb.commit()
-                    st.success("Cliente Adicionado com Sucesso!")
-                except mysql.connector.Error as err:
-                    st.error(f"Erro ao adicionar cliente: {err}")
-            else:
-                st.error("ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
+            try:
+                mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (id_pessoa,))
+                pessoa_exists = mycursor.fetchone()[0]
+                st.write(f"ID_Pessoa {id_pessoa} exists in Pessoa table: {pessoa_exists > 0}")
+                
+                if pessoa_exists > 0:
+                    try:
+                        sql = "INSERT INTO Cliente (ID_Cliente, ID_Pessoa) VALUES (%s, %s)"
+                        val = (id_cliente, id_pessoa)
+                        mycursor.execute(sql, val)
+                        mydb.commit()
+                        st.success("Cliente Adicionado com Sucesso!")
+                    except mysql.connector.Error as err:
+                        st.error(f"Erro ao adicionar cliente: {err}")
+                else:
+                    st.error("ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
+            except mysql.connector.Error as err:
+                st.error(f"Erro ao verificar ID_Pessoa: {err}")
 
     elif option == "Ler":
         st.subheader("Ver Clientes")
-        mycursor.execute("SELECT * FROM Cliente")
-        result = mycursor.fetchall()
-        for row in result:
-            st.write(row)
+        try:
+            mycursor.execute("SELECT * FROM Cliente")
+            result = mycursor.fetchall()
+            for row in result:
+                st.write(row)
+        except mysql.connector.Error as err:
+            st.error(f"Erro ao ler clientes: {err}")
 
     elif option == "Atualizar":
         st.subheader("Atualizar Cliente")
@@ -201,11 +208,16 @@ def manage_clientes():
         if st.button("Atualizar"):
             if campo == "ID_Pessoa":
                 # Check if new ID_Pessoa exists in Pessoa table
-                mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (novo_valor,))
-                pessoa_exists = mycursor.fetchone()[0]
-                
-                if not pessoa_exists:
-                    st.error("Novo ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
+                try:
+                    mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (novo_valor,))
+                    pessoa_exists = mycursor.fetchone()[0]
+                    st.write(f"Novo ID_Pessoa {novo_valor} exists in Pessoa table: {pessoa_exists > 0}")
+                    
+                    if not pessoa_exists:
+                        st.error("Novo ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
+                        return
+                except mysql.connector.Error as err:
+                    st.error(f"Erro ao verificar novo ID_Pessoa: {err}")
                     return
             
             try:
