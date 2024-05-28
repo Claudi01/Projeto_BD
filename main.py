@@ -17,86 +17,120 @@ def get_connection():
         st.error(f"Erro ao conectar ao banco de dados: {e}")
         return None
 
-# Função para buscar todos os registros
-def fetch_all():
+# Função para buscar todos os registros da tabela Pessoa
+def fetch_all_pessoas():
     connection = get_connection()
     if connection:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM sua_tabela")
-        rows = cursor.fetchall()
-        connection.close()
-        return rows
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM Pessoa")
+            rows = cursor.fetchall()
+            return rows
+        except Error as e:
+            st.error(f"Erro ao buscar registros de Pessoa: {e}")
+        finally:
+            connection.close()
     return []
+
+# Função para adicionar nova pessoa
+def add_pessoa(nome, cpf, telefone, email):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO Pessoa (Nome, CPF, Telefone, Email) VALUES (%s, %s, %s, %s)", (nome, cpf, telefone, email))
+            connection.commit()
+            st.success("Pessoa adicionada com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao adicionar pessoa: {e}")
+        finally:
+            connection.close()
+
+# Função para buscar todos os registros da tabela Cliente
+def fetch_all_clientes():
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM Cliente")
+            rows = cursor.fetchall()
+            return rows
+        except Error as e:
+            st.error(f"Erro ao buscar registros de Cliente: {e}")
+        finally:
+            connection.close()
+    return []
+
+# Função para adicionar novo cliente
+def add_cliente(id_pessoa):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO Cliente (ID_Pessoa) VALUES (%s)", (id_pessoa,))
+            connection.commit()
+            st.success("Cliente adicionado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao adicionar cliente: {e}")
+        finally:
+            connection.close()
+
+# Função para buscar todos os registros da tabela Vendedor
+def fetch_all_vendedores():
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM Vendedor")
+            rows = cursor.fetchall()
+            return rows
+        except Error as e:
+            st.error(f"Erro ao buscar registros de Vendedor: {e}")
+        finally:
+            connection.close()
+    return []
+
+# Função para adicionar novo vendedor
+def add_vendedor(id_pessoa, gerente_id):
+    connection = get_connection()
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO Vendedor (ID_Pessoa, Gerente_ID) VALUES (%s, %s)", (id_pessoa, gerente_id))
+            connection.commit()
+            st.success("Vendedor adicionado com sucesso!")
+        except Error as e:
+            st.error(f"Erro ao adicionar vendedor: {e}")
+        finally:
+            connection.close()
 
 # Título do aplicativo
 st.title("Banco de Dados GFC Veículos")
 
-# Leitura (Read)
-st.subheader("Registros Atuais")
-rows = fetch_all()
-if rows:
-    for row in rows:
-        st.write(row)
-else:
-    st.write("Nenhum registro encontrado.")
+# Adicionar Pessoa
+st.subheader("Adicionar Nova Pessoa")
+with st.form("add_pessoa_form"):
+    nome = st.text_input("Nome")
+    cpf = st.text_input("CPF")
+    telefone = st.text_input("Telefone")
+    email = st.text_input("Email")
+    submit_add_pessoa = st.form_submit_button("Adicionar Pessoa")
+    if submit_add_pessoa:
+        add_pessoa(nome, cpf, telefone, email)
 
-# Criação (Create)
-st.subheader("Adicionar Novo Registro")
-with st.form("create_form"):
-    novo_dado = st.text_input("Digite o novo dado")
-    submit_create = st.form_submit_button("Adicionar")
-    if submit_create:
-        if not novo_dado:
-            st.error("O campo não pode estar vazio.")
-        else:
-            connection = get_connection()
-            if connection:
-                cursor = connection.cursor()
-                cursor.execute("INSERT INTO sua_tabela (coluna) VALUES (%s)", (novo_dado,))
-                connection.commit()
-                connection.close()
-                st.success("Registro adicionado com sucesso!")
-                st.experimental_rerun()
+# Adicionar Cliente
+st.subheader("Adicionar Novo Cliente")
+with st.form("add_cliente_form"):
+    id_pessoa_cliente = st.number_input("ID da Pessoa do Cliente")
+    submit_add_cliente = st.form_submit_button("Adicionar Cliente")
+    if submit_add_cliente:
+        add_cliente(id_pessoa_cliente)
 
-# Atualização (Update)
-st.subheader("Atualizar Registro")
-with st.form("update_form"):
-    id_registro = st.number_input("ID do Registro a ser atualizado", min_value=0, step=1)
-    novo_valor = st.text_input("Novo valor")
-    submit_update = st.form_submit_button("Atualizar")
-    if submit_update:
-        if id_registro == 0 or not novo_valor:
-            st.error("Todos os campos devem ser preenchidos.")
-        else:
-            connection = get_connection()
-            if connection:
-                cursor = connection.cursor()
-                cursor.execute("UPDATE sua_tabela SET coluna = %s WHERE id = %s", (novo_valor, id_registro))
-                if cursor.rowcount == 0:
-                    st.error("ID não encontrado.")
-                else:
-                    connection.commit()
-                    st.success("Registro atualizado com sucesso!")
-                connection.close()
-                st.experimental_rerun()
-
-# Exclusão (Delete)
-st.subheader("Excluir Registro")
-with st.form("delete_form"):
-    id_excluir = st.number_input("ID do Registro a ser excluído", min_value=0, step=1)
-    submit_delete = st.form_submit_button("Excluir")
-    if submit_delete:
-        if id_excluir == 0:
-            st.error("O campo ID deve ser preenchido.")
-        else:
-            connection = get_connection()
-            if connection:
-                cursor = connection.cursor()
-                cursor.execute("DELETE FROM sua_tabela WHERE id = %s", (id_excluir,))
-                if cursor.rowcount == 0:
-                    st.error("ID não encontrado.")
-                else:
-                    connection.commit()
-                    st.success("Registro excluído com sucesso!")
-                connection.close()
-                st.experimental_rerun()
+# Adicionar Vendedor
+st.subheader("Adicionar Novo Vendedor")
+with st.form("add_vendedor_form"):
+    id_pessoa_vendedor = st.number_input("ID da Pessoa do Vendedor")
+    gerente_id = st.number_input("ID do Gerente (se aplicável)")
+    submit_add_vendedor = st.form_submit_button("Adicionar Vendedor")
+    if submit_add_vendedor:
+        add_vendedor(id_pessoa_vendedor, gerente_id)
