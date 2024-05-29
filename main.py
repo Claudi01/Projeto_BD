@@ -14,7 +14,6 @@ print("Connection Established")
 
 # Criação do Trigger
 try:
-    mycursor.execute("DELIMITER //")
     mycursor.execute("""
         CREATE TRIGGER after_update_venda
         AFTER UPDATE ON Venda
@@ -24,9 +23,8 @@ try:
                 INSERT INTO Log_Alteracao_Venda (ID_Venda, Valor_Total_Antigo, Valor_Total_Novo, Data_Alteracao)
                 VALUES (OLD.ID_Venda, OLD.Valor_Total, NEW.Valor_Total, NOW());
             END IF;
-        END//
+        END;
     """)
-    mycursor.execute("DELIMITER ;")
     mydb.commit()
     print("Trigger created successfully!")
 except mysql.connector.Error as err:
@@ -34,7 +32,6 @@ except mysql.connector.Error as err:
 
 # Função principal
 def main():
-    relatorio_funcionario() 
     st.sidebar.title("Menu")
     page = st.sidebar.selectbox("Selecione a Página", ["Venda", "Administrador"])
     
@@ -47,32 +44,30 @@ def main():
 def venda_page():
     st.title("GFC Veículos - Venda")
     st.subheader("Página de Venda")
-    tabs = ["Gerenciar Dados", "Buscar Vendas"]  
-    tab = st.selectbox("Selecione uma Função", tabs)
-
-    if tab == "Gerenciar Dados":
+    tabs = st.tabs(["Gerenciar Dados", "Buscar Vendas"])
+    
+    with tabs[0]:
         manage_dados()
-    elif tab == "Buscar Vendas":  
-        buscar_vendas()  
+    with tabs[1]:
+        buscar_vendas()
 
 # Página do Administrador
 def administrador_page():
     st.title("GFC Veículos - Administrador")
     st.subheader("Página do Administrador")
-    tabs = ["Gerenciar Pessoas", "Gerenciar Vendedores", "Gerenciar Clientes", "Gerenciar Veículos", "Gerenciar Acessórios", "Relatório"]
-    tab = st.selectbox("Selecione uma Função", tabs)
-
-    if tab == "Gerenciar Pessoas":
+    tabs = st.tabs(["Gerenciar Pessoas", "Gerenciar Vendedores", "Gerenciar Clientes", "Gerenciar Veículos", "Gerenciar Acessórios", "Relatório"])
+    
+    with tabs[0]:
         manage_pessoas()
-    elif tab == "Gerenciar Vendedores":
+    with tabs[1]:
         manage_vendedores()
-    elif tab == "Gerenciar Clientes":
+    with tabs[2]:
         manage_clientes()
-    elif tab == "Gerenciar Veículos":
+    with tabs[3]:
         manage_veiculos()
-    elif tab == "Gerenciar Acessórios":
+    with tabs[4]:
         manage_acessorios()
-    elif tab == "Relatório":
+    with tabs[5]:
         relatorio_page()
 
 # Página de Relatório
@@ -99,53 +94,27 @@ def relatorio_funcionario_mysql(id_vendedor):
         print("Erro ao gerar o relatório:", err)
         return None
 
-# Função de Relatório
-def relatorio_funcionario():
-    try:
-        mycursor.execute("DELIMITER //")
-        mycursor.execute("""
-            CREATE FUNCTION relatorio_funcionario()
-            RETURNS TEXT
-            BEGIN
-                DECLARE relatorio TEXT;
-                SET relatorio = '';
-
-                SELECT CONCAT('ID do Vendedor: ', ID_Vendedor, ', Total de Vendas: ', COUNT(*))
-                INTO relatorio
-                FROM Venda
-                GROUP BY ID_Vendedor
-                HAVING COUNT(*) > 0;
-
-                IF relatorio IS NULL THEN
-                    SET relatorio = 'Nenhum dado encontrado para gerar o relatório.';
-                END IF;
-
-                RETURN relatorio;
-            END//
-        """)
-        mycursor.execute("DELIMITER ;")
-        mydb.commit()
-        print("Function created successfully!")
-    except mysql.connector.Error as err:
-        print("Error creating function:", err)
 # Gerenciar Pessoas
 def manage_pessoas():
     st.subheader("Gerenciar Pessoas")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
 
     if option == "Criar":
-        st.subheader("Adicionar uma Pessoa")
-        id_pessoa = st.text_input("ID da Pessoa")
-        nome = st.text_input("Nome")
-        cpf = st.text_input("CPF")
-        telefone = st.text_input("Telefone")
-        email = st.text_input("Email")
-        if st.button("Adicionar"):
-            sql = "INSERT INTO Pessoa (ID_Pessoa, Nome, CPF, Telefone, Email) VALUES (%s, %s, %s, %s, %s)"
-            val = (id_pessoa, nome, cpf, telefone, email)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Pessoa Adicionada com Sucesso!")
+        with st.form(key="criar_pessoa"):
+            st.subheader("Adicionar uma Pessoa")
+            id_pessoa = st.text_input("ID da Pessoa")
+            nome = st.text_input("Nome")
+            cpf = st.text_input("CPF")
+            telefone = st.text_input("Telefone")
+            email = st.text_input("Email")
+            submit_button = st.form_submit_button(label="Adicionar")
+            
+            if submit_button:
+                sql = "INSERT INTO Pessoa (ID_Pessoa, Nome, CPF, Telefone, Email) VALUES (%s, %s, %s, %s, %s)"
+                val = (id_pessoa, nome, cpf, telefone, email)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Pessoa Adicionada com Sucesso!")
 
     elif option == "Ler":
         st.subheader("Ver Pessoas")
@@ -155,26 +124,32 @@ def manage_pessoas():
             st.write(row)
 
     elif option == "Atualizar":
-        st.subheader("Atualizar Pessoa")
-        id_pessoa = st.text_input("ID da Pessoa")
-        campo = st.selectbox("Campo para Atualizar", ["Nome", "CPF", "Telefone", "Email"])
-        novo_valor = st.text_input(f"Novo Valor para {campo}")
-        if st.button("Atualizar"):
-            sql = f"UPDATE Pessoa SET {campo}=%s WHERE ID_Pessoa=%s"
-            val = (novo_valor, id_pessoa)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Pessoa Atualizada com Sucesso!")
+        with st.form(key="atualizar_pessoa"):
+            st.subheader("Atualizar Pessoa")
+            id_pessoa = st.text_input("ID da Pessoa")
+            campo = st.selectbox("Campo para Atualizar", ["Nome", "CPF", "Telefone", "Email"])
+            novo_valor = st.text_input(f"Novo Valor para {campo}")
+            submit_button = st.form_submit_button(label="Atualizar")
+            
+            if submit_button:
+                sql = f"UPDATE Pessoa SET {campo}=%s WHERE ID_Pessoa=%s"
+                val = (novo_valor, id_pessoa)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Pessoa Atualizada com Sucesso!")
 
     elif option == "Apagar":
-        st.subheader("Apagar Pessoa")
-        id_pessoa = st.text_input("ID da Pessoa")
-        if st.button("Apagar"):
-            sql = "DELETE FROM Pessoa WHERE ID_Pessoa=%s"
-            val = (id_pessoa,)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Pessoa Apagada com Sucesso!")
+        with st.form(key="apagar_pessoa"):
+            st.subheader("Apagar Pessoa")
+            id_pessoa = st.text_input("ID da Pessoa")
+            submit_button = st.form_submit_button(label="Apagar")
+            
+            if submit_button:
+                sql = "DELETE FROM Pessoa WHERE ID_Pessoa=%s"
+                val = (id_pessoa,)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Pessoa Apagada com Sucesso!")
 
 # Gerenciar Vendedores
 def manage_vendedores():
@@ -182,16 +157,19 @@ def manage_vendedores():
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
 
     if option == "Criar":
-        st.subheader("Adicionar um Vendedor")
-        id_vendedor = st.text_input("ID do Vendedor")
-        id_pessoa = st.text_input("ID da Pessoa")
-        gerente_id = st.text_input("ID do Gerente")
-        if st.button("Adicionar"):
-            sql = "INSERT INTO Vendedor (ID_Vendedor, ID_Pessoa, Gerente_ID) VALUES (%s, %s, %s)"
-            val = (id_vendedor, id_pessoa, gerente_id)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Vendedor Adicionado com Sucesso!")
+        with st.form(key="criar_vendedor"):
+            st.subheader("Adicionar um Vendedor")
+            id_vendedor = st.text_input("ID do Vendedor")
+            id_pessoa = st.text_input("ID da Pessoa")
+            gerente_id = st.text_input("ID do Gerente")
+            submit_button = st.form_submit_button(label="Adicionar")
+            
+            if submit_button:
+                sql = "INSERT INTO Vendedor (ID_Vendedor, ID_Pessoa, Gerente_ID) VALUES (%s, %s, %s)"
+                val = (id_vendedor, id_pessoa, gerente_id)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Vendedor Adicionado com Sucesso!")
 
     elif option == "Ler":
         st.subheader("Ver Vendedores")
@@ -201,25 +179,31 @@ def manage_vendedores():
             st.write(row)
 
     elif option == "Atualizar":
-        st.subheader("Atualizar Vendedor")
-        old_id = st.text_input("ID Antigo do Vendedor")
-        new_id = st.text_input("Novo ID do Vendedor")
-        if st.button("Atualizar"):
-            sql = "UPDATE Vendedor SET ID_Vendedor=%s WHERE ID_Vendedor=%s"
-            val = (new_id, old_id)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Vendedor Atualizado com Sucesso!")
+        with st.form(key="atualizar_vendedor"):
+            st.subheader("Atualizar Vendedor")
+            old_id = st.text_input("ID Antigo do Vendedor")
+            new_id = st.text_input("Novo ID do Vendedor")
+            submit_button = st.form_submit_button(label="Atualizar")
+            
+            if submit_button:
+                sql = "UPDATE Vendedor SET ID_Vendedor=%s WHERE ID_Vendedor=%s"
+                val = (new_id, old_id)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Vendedor Atualizado com Sucesso!")
 
     elif option == "Apagar":
-        st.subheader("Apagar Vendedor")
-        id_vendedor = st.text_input("ID do Vendedor")
-        if st.button("Apagar"):
-            sql = "DELETE FROM Vendedor WHERE ID_Vendedor=%s"
-            val = (id_vendedor,)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Vendedor Apagado com Sucesso!")
+        with st.form(key="apagar_vendedor"):
+            st.subheader("Apagar Vendedor")
+            id_vendedor = st.text_input("ID do Vendedor")
+            submit_button = st.form_submit_button(label="Apagar")
+            
+            if submit_button:
+                sql = "DELETE FROM Vendedor WHERE ID_Vendedor=%s"
+                val = (id_vendedor,)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Vendedor Apagado com Sucesso!")
 
 # Gerenciar Clientes
 def manage_clientes():
@@ -227,81 +211,66 @@ def manage_clientes():
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
 
     if option == "Criar":
-        st.subheader("Adicionar um Cliente")
-        id_cliente = st.text_input("ID do Cliente")
-        id_pessoa = st.text_input("ID da Pessoa")
-        
-        if st.button("Adicionar"):
-            # Verificar se ID_Pessoa existe na tabela Pessoa
-            try:
-                mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (id_pessoa,))
-                pessoa_exists = mycursor.fetchone()[0]
-                
-                if pessoa_exists > 0:
-                    try:
-                        sql = "INSERT INTO Cliente (ID_Cliente, ID_Pessoa) VALUES (%s, %s)"
-                        val = (id_cliente, id_pessoa)
-                        mycursor.execute(sql, val)
-                        mydb.commit()
-                        st.success("Cliente Adicionado com Sucesso!")
-                    except mysql.connector.Error as err:
-                        st.error(f"Erro ao adicionar cliente: {err}")
-                else:
-                    st.error("ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
-            except mysql.connector.Error as err:
-                st.error(f"Erro ao verificar ID_Pessoa: {err}")
+        with st.form(key="criar_cliente"):
+            st.subheader("Adicionar um Cliente")
+            id_cliente = st.text_input("ID do Cliente")
+            id_pessoa = st.text_input("ID da Pessoa")
+            submit_button = st.form_submit_button(label="Adicionar")
+            
+            if submit_button:
+                # Verificar se ID_Pessoa existe na tabela Pessoa
+                try:
+                    mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (id_pessoa,))
+                    pessoa_exists = mycursor.fetchone()[0]
+                    
+                    if pessoa_exists > 0:
+                        try:
+                            sql = "INSERT INTO Cliente (ID_Cliente, ID_Pessoa) VALUES (%s, %s)"
+                            val = (id_cliente, id_pessoa)
+                            mycursor.execute(sql, val)
+                            mydb.commit()
+                            st.success("Cliente Adicionado com Sucesso!")
+                        except mysql.connector.Error as err:
+                            st.error(f"Erro ao adicionar cliente: {err}")
+                    else:
+                        st.error("ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
+                except mysql.connector.Error as err:
+                    st.error(f"Erro ao verificar ID_Pessoa: {err}")
 
     elif option == "Ler":
         st.subheader("Ver Clientes")
-        try:
-            mycursor.execute("SELECT * FROM Cliente")
-            result = mycursor.fetchall()
-            for row in result:
-                st.write(row)
-        except mysql.connector.Error as err:
-            st.error(f"Erro ao ler clientes: {err}")
+        mycursor.execute("SELECT * FROM Cliente")
+        result = mycursor.fetchall()
+        for row in result:
+            st.write(row)
 
     elif option == "Atualizar":
-        st.subheader("Atualizar Cliente")
-        id_cliente = st.text_input("ID do Cliente")
-        campo = st.selectbox("Campo para Atualizar", ["ID_Pessoa"])
-        novo_valor = st.text_input(f"Novo Valor para {campo}")
-        
-        if st.button("Atualizar"):
-            if campo == "ID_Pessoa":
-                # Verificar se novo ID_Pessoa existe na tabela Pessoa
-                try:
-                    mycursor.execute("SELECT COUNT(*) FROM Pessoa WHERE ID_Pessoa = %s", (novo_valor,))
-                    pessoa_exists = mycursor.fetchone()[0]
-                    
-                    if not pessoa_exists:
-                        st.error("Novo ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
-                        return
-                except mysql.connector.Error as err:
-                    st.error(f"Erro ao verificar novo ID_Pessoa: {err}")
-                    return
+        with st.form(key="atualizar_cliente"):
+            st.subheader("Atualizar Cliente")
+            id_cliente = st.text_input("ID do Cliente")
+            campo = st.selectbox("Campo para Atualizar", ["ID_Pessoa"])
+            novo_valor = st.text_input(f"Novo Valor para {campo}")
+            submit_button = st.form_submit_button(label="Atualizar")
             
-            try:
+            if submit_button:
                 sql = f"UPDATE Cliente SET {campo}=%s WHERE ID_Cliente=%s"
                 val = (novo_valor, id_cliente)
                 mycursor.execute(sql, val)
                 mydb.commit()
                 st.success("Cliente Atualizado com Sucesso!")
-            except mysql.connector.Error as err:
-                st.error(f"Erro ao atualizar cliente: {err}")
 
     elif option == "Apagar":
-        st.subheader("Apagar Cliente")
-        id_cliente = st.text_input("ID do Cliente")
-        if st.button("Apagar"):
-            try:
+        with st.form(key="apagar_cliente"):
+            st.subheader("Apagar Cliente")
+            id_cliente = st.text_input("ID do Cliente")
+            submit_button = st.form_submit_button(label="Apagar")
+            
+            if submit_button:
                 sql = "DELETE FROM Cliente WHERE ID_Cliente=%s"
                 val = (id_cliente,)
                 mycursor.execute(sql, val)
                 mydb.commit()
                 st.success("Cliente Apagado com Sucesso!")
-            except mysql.connector.Error as err:
-                st.error(f"Erro ao apagar cliente: {err}")
 
 # Gerenciar Veículos
 def manage_veiculos():
@@ -309,47 +278,56 @@ def manage_veiculos():
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
 
     if option == "Criar":
-        st.subheader("Adicionar um Veículo")
-        id_veiculo = st.text_input("ID do Veículo")
-        modelo = st.text_input("Modelo")
-        ano = st.text_input("Ano")
-        cor = st.text_input("Cor")
-        preco = st.text_input("Preço")
-        if st.button("Adicionar"):
-            sql = "INSERT INTO Veículo (ID_Veículo, Modelo, Ano, Cor, Preço) VALUES (%s, %s, %s, %s, %s)"
-            val = (id_veiculo, modelo, ano, cor, preco)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Veículo Adicionado com Sucesso!")
+        with st.form(key="criar_veiculo"):
+            st.subheader("Adicionar um Veículo")
+            id_veiculo = st.text_input("ID do Veículo")
+            modelo = st.text_input("Modelo")
+            marca = st.text_input("Marca")
+            ano = st.text_input("Ano")
+            preco = st.text_input("Preço")
+            submit_button = st.form_submit_button(label="Adicionar")
+            
+            if submit_button:
+                sql = "INSERT INTO Veiculo (ID_Veiculo, Modelo, Marca, Ano, Preco) VALUES (%s, %s, %s, %s, %s)"
+                val = (id_veiculo, modelo, marca, ano, preco)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Veículo Adicionado com Sucesso!")
 
     elif option == "Ler":
         st.subheader("Ver Veículos")
-        mycursor.execute("SELECT * FROM Veículo")
+        mycursor.execute("SELECT * FROM Veiculo")
         result = mycursor.fetchall()
         for row in result:
             st.write(row)
 
     elif option == "Atualizar":
-        st.subheader("Atualizar Veículo")
-        id_veiculo = st.text_input("ID do Veículo")
-        campo = st.selectbox("Campo para Atualizar", ["Modelo", "Ano", "Cor", "Preço"])
-        novo_valor = st.text_input(f"Novo Valor para {campo}")
-        if st.button("Atualizar"):
-            sql = f"UPDATE Veículo SET {campo}=%s WHERE ID_Veículo=%s"
-            val = (novo_valor, id_veiculo)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Veículo Atualizado com Sucesso!")
+        with st.form(key="atualizar_veiculo"):
+            st.subheader("Atualizar Veículo")
+            id_veiculo = st.text_input("ID do Veículo")
+            campo = st.selectbox("Campo para Atualizar", ["Modelo", "Marca", "Ano", "Preço"])
+            novo_valor = st.text_input(f"Novo Valor para {campo}")
+            submit_button = st.form_submit_button(label="Atualizar")
+            
+            if submit_button:
+                sql = f"UPDATE Veiculo SET {campo}=%s WHERE ID_Veiculo=%s"
+                val = (novo_valor, id_veiculo)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Veículo Atualizado com Sucesso!")
 
     elif option == "Apagar":
-        st.subheader("Apagar Veículo")
-        id_veiculo = st.text_input("ID do Veículo")
-        if st.button("Apagar"):
-            sql = "DELETE FROM Veículo WHERE ID_Veículo=%s"
-            val = (id_veiculo,)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Veículo Apagado com Sucesso!")
+        with st.form(key="apagar_veiculo"):
+            st.subheader("Apagar Veículo")
+            id_veiculo = st.text_input("ID do Veículo")
+            submit_button = st.form_submit_button(label="Apagar")
+            
+            if submit_button:
+                sql = "DELETE FROM Veiculo WHERE ID_Veiculo=%s"
+                val = (id_veiculo,)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Veículo Apagado com Sucesso!")
 
 # Gerenciar Acessórios
 def manage_acessorios():
@@ -357,108 +335,73 @@ def manage_acessorios():
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
 
     if option == "Criar":
-        st.subheader("Adicionar um Acessório")
-        id_acessorio = st.text_input("ID do Acessório")
-        nome = st.text_input("Nome")
-        descricao = st.text_input("Descrição")
-        if st.button("Adicionar"):
-            sql = "INSERT INTO Acessório (ID_Acessório, Nome, Descrição) VALUES (%s, %s, %s)"
-            val = (id_acessorio, nome, descricao)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Acessório Adicionado com Sucesso!")
+        with st.form(key="criar_acessorio"):
+            st.subheader("Adicionar um Acessório")
+            id_acessorio = st.text_input("ID do Acessório")
+            descricao = st.text_input("Descrição")
+            preco = st.text_input("Preço")
+            submit_button = st.form_submit_button(label="Adicionar")
+            
+            if submit_button:
+                sql = "INSERT INTO Acessorio (ID_Acessorio, Descricao, Preco) VALUES (%s, %s, %s)"
+                val = (id_acessorio, descricao, preco)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Acessório Adicionado com Sucesso!")
 
     elif option == "Ler":
         st.subheader("Ver Acessórios")
-        mycursor.execute("SELECT * FROM Acessório")
+        mycursor.execute("SELECT * FROM Acessorio")
         result = mycursor.fetchall()
         for row in result:
             st.write(row)
 
     elif option == "Atualizar":
-        st.subheader("Atualizar Acessório")
-        id_acessorio = st.text_input("ID do Acessório")
-        campo = st.selectbox("Campo para Atualizar", ["Descrição", "Preço"])
-        novo_valor = st.text_input(f"Novo Valor para {campo}")
-        if st.button("Atualizar"):
-            sql = f"UPDATE Acessório SET {campo}=%s WHERE ID_Acessório=%s"
-            val = (novo_valor, id_acessorio)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Acessório Atualizado com Sucesso!")
+        with st.form(key="atualizar_acessorio"):
+            st.subheader("Atualizar Acessório")
+            id_acessorio = st.text_input("ID do Acessório")
+            campo = st.selectbox("Campo para Atualizar", ["Descrição", "Preço"])
+            novo_valor = st.text_input(f"Novo Valor para {campo}")
+            submit_button = st.form_submit_button(label="Atualizar")
+            
+            if submit_button:
+                sql = f"UPDATE Acessorio SET {campo}=%s WHERE ID_Acessorio=%s"
+                val = (novo_valor, id_acessorio)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Acessório Atualizado com Sucesso!")
 
     elif option == "Apagar":
-        st.subheader("Apagar Acessório")
-        id_acessorio = st.text_input("ID do Acessório")
-        if st.button("Apagar"):
-            sql = "DELETE FROM Acessório WHERE ID_Acessório=%s"
-            val = (id_acessorio,)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Acessório Apagado com Sucesso!")
+        with st.form(key="apagar_acessorio"):
+            st.subheader("Apagar Acessório")
+            id_acessorio = st.text_input("ID do Acessório")
+            submit_button = st.form_submit_button(label="Apagar")
+            
+            if submit_button:
+                sql = "DELETE FROM Acessorio WHERE ID_Acessorio=%s"
+                val = (id_acessorio,)
+                mycursor.execute(sql, val)
+                mydb.commit()
+                st.success("Acessório Apagado com Sucesso!")
+
+# Gerenciar Dados
+def manage_dados():
+    st.subheader("Gerenciar Dados")
+    st.write("Funções para criar, ler, atualizar e apagar dados no banco de dados.")
 
 # Buscar Vendas
 def buscar_vendas():
     st.subheader("Buscar Vendas")
+    st.write("Insira o ID da venda que deseja buscar:")
     id_venda = st.text_input("ID da Venda")
+
     if st.button("Buscar"):
-        sql = "SELECT * FROM Venda WHERE ID_Venda = %s"
-        val = (id_venda,)
-        mycursor.execute(sql, val)
-        result = mycursor.fetchall()
+        mycursor.execute("SELECT * FROM Venda WHERE ID_Venda = %s", (id_venda,))
+        result = mycursor.fetchone()
         if result:
-            for row in result:
-                st.write(row)
+            st.write(result)
         else:
-            st.write("Nenhuma venda encontrada com o ID fornecido.")
+            st.write("Nenhuma venda encontrada com esse ID.")
 
-# Gerenciar Dados da Venda
-def manage_dados():
-    st.subheader("Gerenciar Dados da Venda")
-    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
-
-    if option == "Criar":
-        st.subheader("Adicionar uma Venda")
-        id_venda = st.text_input("ID da Venda")
-        id_vendedor = st.text_input("ID do Vendedor")
-        id_cliente = st.text_input("ID do Cliente")
-        data_venda = st.text_input("Data da Venda")
-        valor_total = st.text_input("Valor Total")
-        if st.button("Adicionar"):
-            sql = "INSERT INTO Venda (ID_Venda, ID_Vendedor, ID_Cliente, Data_Venda, Valor_Total) VALUES (%s, %s, %s, %s, %s)"
-            val = (id_venda, id_vendedor, id_cliente, data_venda, valor_total)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Venda Adicionada com Sucesso!")
-
-    elif option == "Ler":
-        st.subheader("Ver Vendas")
-        mycursor.execute("SELECT * FROM Venda")
-        result = mycursor.fetchall()
-        for row in result:
-            st.write(row)
-
-    elif option == "Atualizar":
-        st.subheader("Atualizar Venda")
-        id_venda = st.text_input("ID da Venda")
-        campo = st.selectbox("Campo para Atualizar", ["ID_Vendedor", "ID_Cliente", "Data_Venda", "Valor_Total"])
-        novo_valor = st.text_input(f"Novo Valor para {campo}")
-        if st.button("Atualizar"):
-            sql = f"UPDATE Venda SET {campo}=%s WHERE ID_Venda=%s"
-            val = (novo_valor, id_venda)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Venda Atualizada com Sucesso!")
-
-    elif option == "Apagar":
-        st.subheader("Apagar Venda")
-        id_venda = st.text_input("ID da Venda")
-        if st.button("Apagar"):
-            sql = "DELETE FROM Venda WHERE ID_Venda=%s"
-            val = (id_venda,)
-            mycursor.execute(sql, val)
-            mydb.commit()
-            st.success("Venda Apagada com Sucesso!")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
