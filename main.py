@@ -5,7 +5,7 @@ import streamlit as st
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="GabrielRoma4215!",
+    password="Bradesco01",
     database="projetoBD"
 )
 mycursor = mydb.cursor()
@@ -97,7 +97,7 @@ def relatorio_funcionario_mysql(id_vendedor):
 # Gerenciar Pessoas
 def manage_pessoas():
     st.subheader("Gerenciar Pessoas")
-    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
+    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="pessoas_selectbox")
 
     if option == "Criar":
         with st.form(key="criar_pessoa"):
@@ -127,7 +127,7 @@ def manage_pessoas():
         with st.form(key="atualizar_pessoa"):
             st.subheader("Atualizar Pessoa")
             id_pessoa = st.text_input("ID da Pessoa")
-            campo = st.selectbox("Campo para Atualizar", ["Nome", "CPF", "Telefone", "Email"])
+            campo = st.selectbox("Campo para Atualizar", ["Nome", "CPF", "Telefone", "Email"], key="pessoa_update_selectbox")
             novo_valor = st.text_input(f"Novo Valor para {campo}")
             submit_button = st.form_submit_button(label="Atualizar")
             
@@ -154,7 +154,7 @@ def manage_pessoas():
 # Gerenciar Vendedores
 def manage_vendedores():
     st.subheader("Gerenciar Vendedores")
-    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
+    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="vendedores_selectbox")
 
     if option == "Criar":
         with st.form(key="criar_vendedor"):
@@ -208,7 +208,7 @@ def manage_vendedores():
 # Gerenciar Clientes
 def manage_clientes():
     st.subheader("Gerenciar Clientes")
-    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
+    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="clientes_selectbox")
 
     if option == "Criar":
         with st.form(key="criar_cliente"):
@@ -233,9 +233,9 @@ def manage_clientes():
                         except mysql.connector.Error as err:
                             st.error(f"Erro ao adicionar cliente: {err}")
                     else:
-                        st.error("ID_Pessoa não existe na tabela Pessoa. Por favor, adicione primeiro essa pessoa.")
+                        st.error("ID_Pessoa não existe na tabela Pessoa.")
                 except mysql.connector.Error as err:
-                    st.error(f"Erro ao verificar ID_Pessoa: {err}")
+                    st.error(f"Erro ao verificar existência da pessoa: {err}")
 
     elif option == "Ler":
         st.subheader("Ver Clientes")
@@ -248,7 +248,7 @@ def manage_clientes():
         with st.form(key="atualizar_cliente"):
             st.subheader("Atualizar Cliente")
             id_cliente = st.text_input("ID do Cliente")
-            campo = st.selectbox("Campo para Atualizar", ["ID_Pessoa"])
+            campo = st.selectbox("Campo para Atualizar", ["ID_Pessoa"], key="cliente_update_selectbox")
             novo_valor = st.text_input(f"Novo Valor para {campo}")
             submit_button = st.form_submit_button(label="Atualizar")
             
@@ -275,7 +275,7 @@ def manage_clientes():
 # Gerenciar Veículos
 def manage_veiculos():
     st.subheader("Gerenciar Veículos")
-    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
+    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="veiculos_selectbox")
 
     if option == "Criar":
         with st.form(key="criar_veiculo"):
@@ -305,7 +305,7 @@ def manage_veiculos():
         with st.form(key="atualizar_veiculo"):
             st.subheader("Atualizar Veículo")
             id_veiculo = st.text_input("ID do Veículo")
-            campo = st.selectbox("Campo para Atualizar", ["Modelo", "Marca", "Ano", "Preço"])
+            campo = st.selectbox("Campo para Atualizar", ["Modelo", "Marca", "Ano", "Preço"], key="veiculo_update_selectbox")
             novo_valor = st.text_input(f"Novo Valor para {campo}")
             submit_button = st.form_submit_button(label="Atualizar")
             
@@ -332,7 +332,7 @@ def manage_veiculos():
 # Gerenciar Acessórios
 def manage_acessorios():
     st.subheader("Gerenciar Acessórios")
-    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
+    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="acessorios_selectbox")
 
     if option == "Criar":
         with st.form(key="criar_acessorio"):
@@ -360,7 +360,7 @@ def manage_acessorios():
         with st.form(key="atualizar_acessorio"):
             st.subheader("Atualizar Acessório")
             id_acessorio = st.text_input("ID do Acessório")
-            campo = st.selectbox("Campo para Atualizar", ["Descrição", "Preço"])
+            campo = st.selectbox("Campo para Atualizar", ["Descrição", "Preço"], key="acessorio_update_selectbox")
             novo_valor = st.text_input(f"Novo Valor para {campo}")
             submit_button = st.form_submit_button(label="Atualizar")
             
