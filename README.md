@@ -94,7 +94,9 @@ Vendedor - Vendedor: Gerencia vendedores (1:N)
 
 ## Imagem Modelo Conceitual:
 
-![Trabalho_bd](https://github.com/Craudi01/Projeto_BD/assets/152215002/9ae01cbf-d01d-4ad9-858c-af358b98779f)
+![trabalho_BD_Conceitual](https://github.com/Craudi01/Projeto_BD/assets/152215002/89cab7d9-385c-430d-84a6-1ae734de4c08)
+
+
 
 
 ## Modelo Lógico:
@@ -235,7 +237,8 @@ Chave Estrangeira: Gerente_ID em Vendedor.
 
 ## Imagem Modelo Lógico:
 
-![Trabalho_bd_Logico](https://github.com/Craudi01/Projeto_BD/assets/152215002/d97cc1cb-f111-4171-b457-5a43730ef310)
+![Lógico_1](https://github.com/Craudi01/Projeto_BD/assets/152215002/5bbead7d-c417-4cd1-ba4f-00c2ab58f376)
+
 
 
 
