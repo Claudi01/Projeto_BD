@@ -341,3 +341,6 @@ CREATE TABLE Venda_Veículo (
     FOREIGN KEY (ID_Veículo) REFERENCES Veículo(ID_Veículo)
 );
 
+# Link do slide da apresentação:
+
+https://www.canva.com/design/DAGGpPn5eVQ/71VT671ECzOD6DdeAFKVyQ/edit?utm_content=DAGGpPn5eVQ&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
