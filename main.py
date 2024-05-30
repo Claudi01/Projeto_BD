@@ -5,7 +5,7 @@ import streamlit as st
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="GabrielRoma4215!",
+    password="Bradesco01",
     database="projetoBD"
 )
 mycursor = mydb.cursor()
