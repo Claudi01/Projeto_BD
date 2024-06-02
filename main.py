@@ -1,7 +1,7 @@
 import mysql.connector
 import streamlit as st
 
-# Conectar ao banco de dados
+
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -12,7 +12,7 @@ mycursor = mydb.cursor()
 
 print("Connection Established")
 
-# Criação do Trigger
+
 try:
     mycursor.execute("""
         CREATE TRIGGER after_update_venda
@@ -30,7 +30,7 @@ try:
 except mysql.connector.Error as err:
     print("Error creating trigger:", err)
 
-# Função principal
+
 def main():
     st.sidebar.title("Menu")
     page = st.sidebar.selectbox("Selecione a Página", ["Venda", "Administrador"])
@@ -40,7 +40,7 @@ def main():
     elif page == "Administrador":
         administrador_page()
 
-# Página de Vendas
+
 def venda_page():
     st.title("GFC Veículos - Venda")
     st.subheader("Página de Venda")
@@ -51,7 +51,7 @@ def venda_page():
     with tabs[1]:
         buscar_vendas()
 
-# Página do Administrador
+
 def administrador_page():
     st.title("GFC Veículos - Administrador")
     st.subheader("Página do Administrador")
@@ -70,7 +70,7 @@ def administrador_page():
     with tabs[5]:
         relatorio_page()
 
-# Página de Relatório
+
 def relatorio_page():
     st.subheader("Relatório")
     st.write("Insira o ID do vendedor para gerar o relatório:")
@@ -83,7 +83,7 @@ def relatorio_page():
         else:
             st.write("Nenhum dado encontrado para gerar o relatório.")
 
-# Função de Relatório no MySQL
+
 def relatorio_funcionario_mysql(id_vendedor):
     try:
         mycursor.callproc("relatorio_funcionario")
@@ -94,7 +94,7 @@ def relatorio_funcionario_mysql(id_vendedor):
         print("Erro ao gerar o relatório:", err)
         return None
 
-# Gerenciar Pessoas
+
 def manage_pessoas():
     st.subheader("Gerenciar Pessoas")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="pessoas_selectbox")
@@ -151,7 +151,7 @@ def manage_pessoas():
                 mydb.commit()
                 st.success("Pessoa Apagada com Sucesso!")
 
-# Gerenciar Vendedores
+
 def manage_vendedores():
     st.subheader("Gerenciar Vendedores")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="vendedores_selectbox")
@@ -205,7 +205,7 @@ def manage_vendedores():
                 mydb.commit()
                 st.success("Vendedor Apagado com Sucesso!")
 
-# Gerenciar Clientes
+
 def manage_clientes():
     st.subheader("Gerenciar Clientes")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="clientes_selectbox")
@@ -272,7 +272,7 @@ def manage_clientes():
                 mydb.commit()
                 st.success("Cliente Apagado com Sucesso!")
 
-# Gerenciar Veículos
+
 def manage_veiculos():
     st.subheader("Gerenciar Veículos")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="veiculos_selectbox")
@@ -329,7 +329,7 @@ def manage_veiculos():
                 mydb.commit()
                 st.success("Veículo Apagado com Sucesso!")
 
-# Gerenciar Acessórios
+
 def manage_acessorios():
     st.subheader("Gerenciar Acessórios")
     option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"), key="acessorios_selectbox")
@@ -384,12 +384,12 @@ def manage_acessorios():
                 mydb.commit()
                 st.success("Acessório Apagado com Sucesso!")
 
-# Gerenciar Dados
+
 def manage_dados():
     st.subheader("Gerenciar Dados")
     st.write("Funções para criar, ler, atualizar e apagar dados no banco de dados.")
 
-# Buscar Vendas
+
 def buscar_vendas():
     st.subheader("Buscar Vendas")
     st.write("Insira o ID da venda que deseja buscar:")
