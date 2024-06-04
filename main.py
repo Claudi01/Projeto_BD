@@ -412,7 +412,7 @@ def manage_dados():
 
     elif option == "Atualizar":
         st.subheader("Atualizar Venda")
-        id_venda = st.text_input("ID da Venda")
+        id_venda = st.text_input("Id da Venda")
         campo = st.selectbox("Campo para Atualizar", ["ID_Vendedor", "ID_Cliente", "Data_Venda", "Valor_Total"])
         novo_valor = st.text_input(f"Novo Valor para {campo}")
         if st.button("Atualizar"):
