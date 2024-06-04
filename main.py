@@ -424,7 +424,7 @@ def manage_dados():
 
     elif option == "Apagar":
         st.subheader("Apagar Venda")
-        id_venda = st.text_input("ID da Venda")
+        id_venda = st.text_input("Id da Venda")
         if st.button("Apagar"):
             sql = "DELETE FROM Venda WHERE ID_Venda=%s"
             val = (id_venda,)
