@@ -388,6 +388,50 @@ def manage_acessorios():
 def manage_dados():
     st.subheader("Gerenciar Dados")
     st.write("Funções para criar, ler, atualizar e apagar dados no banco de dados.")
+    option = st.selectbox("Selecione uma operação", ("Criar", "Ler", "Atualizar", "Apagar"))
+
+    if option == "Criar":
+        st.subheader("Adicionar uma Venda")
+        id_venda = st.text_input("ID da Venda")
+        id_vendedor = st.text_input("ID do Vendedor")
+        id_cliente = st.text_input("ID do Cliente")
+        data_venda = st.text_input("Data da Venda")
+        valor_total = st.text_input("Valor Total")
+        if st.button("Adicionar"):
+            sql = "INSERT INTO Venda (ID_Venda, ID_Vendedor, ID_Cliente, Data_Venda, Valor_Total) VALUES (%s, %s, %s, %s, %s)"
+            val = (id_venda, id_vendedor, id_cliente, data_venda, valor_total)
+            mycursor.execute(sql, val)
+            mydb.commit()
+            st.success("Venda Adicionada com Sucesso!")
+    elif option == "Ler":
+        st.subheader("Ver Vendas")
+        mycursor.execute("SELECT * FROM Venda")
+        result = mycursor.fetchall()
+        for row in result:
+            st.write(row)
+
+    elif option == "Atualizar":
+        st.subheader("Atualizar Venda")
+        id_venda = st.text_input("ID da Venda")
+        campo = st.selectbox("Campo para Atualizar", ["ID_Vendedor", "ID_Cliente", "Data_Venda", "Valor_Total"])
+        novo_valor = st.text_input(f"Novo Valor para {campo}")
+        if st.button("Atualizar"):
+            sql = f"UPDATE Venda SET {campo}=%s WHERE ID_Venda=%s"
+            val = (novo_valor, id_venda)
+            mycursor.execute(sql, val)
+            mydb.commit()
+            st.success("Venda Atualizada com Sucesso!")
+
+    elif option == "Apagar":
+        st.subheader("Apagar Venda")
+        id_venda = st.text_input("ID da Venda")
+        if st.button("Apagar"):
+            sql = "DELETE FROM Venda WHERE ID_Venda=%s"
+            val = (id_venda,)
+            mycursor.execute(sql, val)
+            mydb.commit()
+            st.success("Venda Apagada com Sucesso!")
+
 
 
 def buscar_vendas():
