@@ -392,7 +392,7 @@ def manage_dados():
 
     if option == "Criar":
         st.subheader("Adicionar uma Venda")
-        id_venda = st.text_input("ID da Venda")
+        id_venda = st.text_input("ID da Venda", key='id_venda_criar')
         id_vendedor = st.text_input("ID do Vendedor")
         id_cliente = st.text_input("ID do Cliente")
         data_venda = st.text_input("Data da Venda")
@@ -412,7 +412,7 @@ def manage_dados():
 
     elif option == "Atualizar":
         st.subheader("Atualizar Venda")
-        id_venda = st.text_input("Id da Venda")
+        id_venda = st.text_input("Id da Venda", key='id_venda_att')
         campo = st.selectbox("Campo para Atualizar", ["ID_Vendedor", "ID_Cliente", "Data_Venda", "Valor_Total"])
         novo_valor = st.text_input(f"Novo Valor para {campo}")
         if st.button("Atualizar"):
@@ -424,7 +424,7 @@ def manage_dados():
 
     elif option == "Apagar":
         st.subheader("Apagar Venda")
-        id_venda = st.text_input("Id da Venda")
+        id_venda = st.text_input("Id da Venda", key='id_venda_apaga')
         if st.button("Apagar"):
             sql = "DELETE FROM Venda WHERE ID_Venda=%s"
             val = (id_venda,)
@@ -437,7 +437,7 @@ def manage_dados():
 def buscar_vendas():
     st.subheader("Buscar Vendas")
     st.write("Insira o ID da venda que deseja buscar:")
-    id_venda = st.text_input("ID da Venda")
+    id_venda = st.text_input("ID da Venda", key='id_venda_busca')
 
     if st.button("Buscar"):
         mycursor.execute("SELECT * FROM Venda WHERE ID_Venda = %s", (id_venda,))
